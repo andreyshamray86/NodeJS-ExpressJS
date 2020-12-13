@@ -1,0 +1,27 @@
+{
+  "name": "NodeJS-ExpressJS",
+  "version": "1.0.0",
+  "description": "Practicing NodeJS and ExpressJS from course",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andreyshamray86/NodeJS-ExpressJS.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/andreyshamray86/NodeJS-ExpressJS/issues"
+  },
+  "homepage": "https://github.com/andreyshamray86/NodeJS-ExpressJS#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.6"
+  }
+}
