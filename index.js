@@ -1,8 +1,11 @@
 const express = require('express');
 const path = require("path");
+const csurf = require('csurf');
+const flash = require('connect-flash');
 const mongoose = require("mongoose");
 const exphbs = require("express-handlebars");
 const session = require('express-session');
+const MongoStore = require('connect-mongodb-session')(session);
 const app = express();
 const homeRoutes = require('./routes/home');
 const cardRoutes = require('./routes/card');
@@ -10,8 +13,10 @@ const addRoutes = require('./routes/add');
 const orderRoutes = require('./routes/order');
 const coursesRoutes = require('./routes/courses');
 const authRoutes = require('./routes/auth');
-const User = require('./models/user');
 const varMiddleware = require('./middleware/variables');
+const userMiddleware = require('./middleware/user');
+
+const MONGODB_URI = `mongodb+srv://andrey:82deOTNyia1fSZo0@cluster0.fnlqh.mongodb.net/shop?retryWrites=true&w=majority`;
 
 const hbs = exphbs.create({
     defaultLayout: 'main',
@@ -20,6 +25,11 @@ const hbs = exphbs.create({
         allowProtoPropertiesByDefault: true,
         allowProtoMethodsByDefault: true
     }
+});
+
+const store = new MongoStore({
+    collection: 'sessions',
+    uri: MONGODB_URI
 });
 
 app.engine('hbs', hbs.engine);
@@ -34,10 +44,13 @@ app.use(express.urlencoded({
 app.use(session({
     secret: 'some secret value',
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    store
 }));
-
+app.use(csurf());
+app.use(flash());
 app.use(varMiddleware);
+app.use(userMiddleware);
 
 app.use('/', homeRoutes);
 app.use('/add', addRoutes);
@@ -58,25 +71,11 @@ const PORT = process.env.PORT || 3000;
 
 async function start() {
     try {
-        const url = `mongodb+srv://andrey:82deOTNyia1fSZo0@cluster0.fnlqh.mongodb.net/shop?retryWrites=true&w=majority`;
-        await mongoose.connect(url, {
+        await mongoose.connect(MONGODB_URI, {
             useNewUrlParser: true,
             useFindAndModify: false,
             useUnifiedTopology: true
         });
-
-        // const candidate = await User.findOne();
-
-        // if (!candidate) {
-        //     const user = new User({
-        //         email: 'andrey@mail.ru',
-        //         name: 'Andrey',
-        //         cart: {
-        //             items: []
-        //         }
-        //     });
-        //     await user.save();
-        // }
 
         app.listen(PORT, () => {
             console.log(`Server is running on port ${PORT}`);
